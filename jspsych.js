@@ -1251,6 +1251,10 @@ jsPsych.data = (function() {
     return data;
   };
 
+  module.getAllData = function() {
+    return allData;
+  }
+
   module.getLastTrialData = function() {
     return allData.top();
   };
