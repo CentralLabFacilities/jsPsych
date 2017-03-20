@@ -169,11 +169,17 @@ jsPsych.plugins["citk-single-stim"] = (function() {
     
     if(trial.data.response === 'no-go' || (trial.data.response === 'go' && err <= 0.1)) { // the robot will fail in 10% of trials and press the button at the wrong time. Damn!
         jsPsych.pluginAPI.setTimeout(function() {}, robot_response_time())    
-        jsPsych.plugins['citk'].sendRequest()
+        console.log("key press");
+        jsPsych.plugins['citk'].sendRequest("press")
         if (trial.data.response === 'go' && err <= 0.1) {
             console.log("Noooooooooo")
         }
     }
+    
+    jsPsych.pluginAPI.setTimeout(function() {}, robot_response_time())
+    console.log("key release");
+    jsPsych.plugins['citk'].sendRequest("release")
+        
         
     // end trial if time limit is set
     if (trial.timing_response > 0) {

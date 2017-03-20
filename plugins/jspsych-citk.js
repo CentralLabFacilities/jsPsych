@@ -87,22 +87,26 @@ jsPsych.plugins['citk'] = (function() {
         return params;
     }
     
-    plugin.sendRequest = function() {
+    plugin.sendRequest = async function(method) {
+        function sleep(ms) {
+           return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        
         var proxy = "ALMotion"
         var job_request = "http://"+params.service_url+":"+params.service_port+"/do/"+proxy;
-        var method = "angleInterpolation"
-    
-    
-        var request = {};        
-        request["async"] = false;
-        request["cmd"] = [method];           
         
-        request["cmd"].push("LElbowRoll");
-        request["cmd"].push([[-0.8]]);
+        var request = {}
         
-        request["cmd"].push([[0.2]]);      
-        request["cmd"].push(true);  
+        if(method === "press") {
+            request = keyPressEvent();
+        }
         
+        if(method === "release") {
+            request = keyReleaseEvent();
+        }
+       
+       
         console.log(request)
         console.log(JSON.stringify(request))
     
@@ -122,14 +126,105 @@ jsPsych.plugins['citk'] = (function() {
             }
         };
         xhr.send(JSON.stringify(request));
+        
     }
     
-    plugin.keyPressEvent = function() {
+    plugin.prepareRobot = async function() {
+        function sleep(ms) {
+           return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        
+        var proxy = "ALMotion"
+        var job_request = "http://"+params.service_url+":"+params.service_port+"/do/"+proxy;
+        
+        var request = {};        
+        
+        var method = "rest"
+        request["async"] = false;
+        request["cmd"] = [method];
+        
+        var xhr = new XMLHttpRequest();
+        xhr.open("PUT", job_request, true);
+        xhr.setRequestHeader( "Content-Type", "application/json" );
+        
+        xhr.onload = async function() {
+            if (xhr.status === 200 || xhr.status === 201) {
+                //alert('Job status: ' + xhr.responseText);
+                //await sleep(Math.random() * 1500); //just wait a little bit after displaying the movements...
+                //display_element.innerHTML = ''; // clear the display
+                console.log(xhr.responseText)
+                ready = true;
+                //jsPsych.finishTrial();
+            } else {
+                alert('Request failed. Returned status of ' + xhr.status);
+            }
+        };
+        
+        
+        xhr.send(JSON.stringify(request));    
+        
+        request = {};        
+        method = "stiffnessInterpolation"
+        request["async"] = false;
+        request["cmd"] = [method];
+        request["cmd"].push("Body");
+        request["cmd"].push(0.5);
+        request["cmd"].push(0.2);
+        
+        xhr.send(JSON.stringify(request));
     
+        request = {};        
+        method = "openHand"
+        request["async"] = false;
+        request["cmd"] = [method];
+        request["cmd"].push("LHand")
+        
+        xhr.send(JSON.stringify(request));
+    
+        request = {};        
+        method = "angleInterpolation"
+        request["async"] = false;
+        request["cmd"] = [method];
+        request["cmd"].push(["LShoulderPitch", "LWristYaw"]);
+        request["cmd"].push([[1.5], [1.65]]);
+        request["cmd"].push([[0.8], [0.8]]);
+        request["cmd"].push(true);
+        
+        xhr.send(JSON.stringify(request));
+    
+    }
+    
+    
+    plugin.keyPressEvent = function() {
+        var request = {};        
+        
+        var method = "angleInterpolation"
+        request["async"] = false;
+        request["cmd"] = [method];           
+        
+        request["cmd"].push("LElbowRoll");
+        request["cmd"].push([[-0.8]]);
+        
+        request["cmd"].push([[0.2]]);      
+        request["cmd"].push(true);
+        
+        return request;
     }
     
     plugin.keyReleaseEvent = function() {
-    
+        var request = {};        
+        
+        var method = "angleInterpolation"
+        request["async"] = false;
+        request["cmd"] = [method];           
+        
+        request["cmd"].push("LElbowRoll");
+        request["cmd"].push([[-1.0]]);
+        
+        request["cmd"].push([[0.5]]);      
+        request["cmd"].push(true);
+        
+        return request;
     }
     
     
