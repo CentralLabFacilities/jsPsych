@@ -193,9 +193,9 @@ jsPsych.plugins['citk'] = (function() {
         method = "angleInterpolation"
         request["async"] = false;
         request["cmd"] = [method];
-        request["cmd"].push(["LShoulderPitch", "LWristYaw"]);
-        request["cmd"].push([[1.5], [1.65]]);
-        request["cmd"].push([[0.8], [0.8]]);
+        request["cmd"].push(["LShoulderPitch", "LWristYaw", "LElbowYaw"]);
+        request["cmd"].push([[1.5], [1.65], [-1.45]]);
+        request["cmd"].push([[0.8], [0.8], [0.8]]);
         request["cmd"].push(true);
         
         xhr = new XMLHttpRequest();
