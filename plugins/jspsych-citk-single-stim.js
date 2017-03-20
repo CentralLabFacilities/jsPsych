@@ -174,11 +174,12 @@ jsPsych.plugins["citk-single-stim"] = (function() {
         if (trial.data.response === 'go' && err <= 0.1) {
             console.log("Noooooooooo")
         }
+        jsPsych.pluginAPI.setTimeout(function() {}, robot_response_time())
+        console.log("key release");
+        jsPsych.plugins['citk'].sendRequest("release")
     }
     
-    jsPsych.pluginAPI.setTimeout(function() {}, robot_response_time())
-    console.log("key release");
-    jsPsych.plugins['citk'].sendRequest("release")
+    
         
         
     // end trial if time limit is set

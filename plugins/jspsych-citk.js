@@ -99,11 +99,11 @@ jsPsych.plugins['citk'] = (function() {
         var request = {}
         
         if(method === "press") {
-            request = keyPressEvent();
+            request = this.keyPressEvent();
         }
         
         if(method === "release") {
-            request = keyReleaseEvent();
+            request = this.keyReleaseEvent();
         }
        
        
