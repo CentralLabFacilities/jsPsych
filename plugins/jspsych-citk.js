@@ -169,7 +169,7 @@ jsPsych.plugins['citk'] = (function() {
         method = "stiffnessInterpolation"
         request["async"] = false;
         request["cmd"] = [method];
-        request["cmd"].push("Body");
+        request["cmd"].push("LArm");
         request["cmd"].push(0.5);
         request["cmd"].push(0.2);
         
