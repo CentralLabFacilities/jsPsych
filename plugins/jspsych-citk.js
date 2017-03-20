@@ -160,7 +160,9 @@ jsPsych.plugins['citk'] = (function() {
             }
         };
         
-        
+        xhr = new XMLHttpRequest();
+        xhr.open("PUT", job_request, true);
+        xhr.setRequestHeader( "Content-Type", "application/json" );
         xhr.send(JSON.stringify(request));    
         
         request = {};        
@@ -171,6 +173,9 @@ jsPsych.plugins['citk'] = (function() {
         request["cmd"].push(0.5);
         request["cmd"].push(0.2);
         
+        xhr = new XMLHttpRequest();
+        xhr.open("PUT", job_request, true);
+        xhr.setRequestHeader( "Content-Type", "application/json" );
         xhr.send(JSON.stringify(request));
     
         request = {};        
@@ -179,6 +184,9 @@ jsPsych.plugins['citk'] = (function() {
         request["cmd"] = [method];
         request["cmd"].push("LHand")
         
+        xhr = new XMLHttpRequest();
+        xhr.open("PUT", job_request, true);
+        xhr.setRequestHeader( "Content-Type", "application/json" );
         xhr.send(JSON.stringify(request));
     
         request = {};        
@@ -190,6 +198,9 @@ jsPsych.plugins['citk'] = (function() {
         request["cmd"].push([[0.8], [0.8]]);
         request["cmd"].push(true);
         
+        xhr = new XMLHttpRequest();
+        xhr.open("PUT", job_request, true);
+        xhr.setRequestHeader( "Content-Type", "application/json" );
         xhr.send(JSON.stringify(request));
     
     }
