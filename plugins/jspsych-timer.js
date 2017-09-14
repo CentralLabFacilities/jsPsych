@@ -21,7 +21,7 @@ jsPsych.plugins['timer'] = (function() {
         no_function: false,
         description: ''
       },
-      timing_response: {
+      seconds: {
         type: [jsPsych.plugins.parameterType.INT],
         default: -1,
         no_function: false,
@@ -36,13 +36,14 @@ jsPsych.plugins['timer'] = (function() {
     // value of this parameter, since this plugin should be invisible
     // to the subject of the experiment
     trial.timing_post_trial = typeof trial.timing_post_trial == 'undefined' ? 0 : trial.timing_post_trial
-    trial.timing_response = trial.timing_response || -1;
+    trial.seconds = trial.seconds || -1;
 
-    display_element.innerHTML = '<span id="timer"></span>'
-    
-    var count=trial.timing_response;  
+    var count=trial.seconds;  
     var counter=setInterval(timer, 1000)
 
+    display_element.innerHTML = 'Kurze Pause! Es geht weiter in <br><span id="timer"></span>'
+    document.getElementById("timer").innerHTML=count + " Sekunden."
+    
     var end_trial = function() {
         jsPsych.finishTrial(trial_data);
     }
@@ -54,15 +55,13 @@ jsPsych.plugins['timer'] = (function() {
         {
             clearInterval(counter);
             console.log("finished")//counter ended, do something here
-             end_trial();
+            end_trial();
             return;
         }
-        document.getElementById("timer").innerHTML=count + " secs";
+        document.getElementById("timer").innerHTML=count + " Sekunden.";
     }
 
-    var return_val = trial.func();
-    console.log(return_val)
-    var counter=setInterval(trial.func(), 1000); //1000 will  run it every 1 second
+    var return_val = 0; 
 
     var trial_data = {
       value: return_val

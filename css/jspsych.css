@@ -15,12 +15,14 @@
    /*height: 100%;
    width: 100%;*/
    overflow-y: scroll;
+   background-color: #fff;
+   color: #000;
  }
 
  .jspsych-content-wrapper {
    display: flex;
-   justify-content: center;
-   align-items: center;
+   justify-content: left;
+   align-items: left;
    flex: 1 1 100%;
    width: 100%;
  }
@@ -28,9 +30,28 @@
  .jspsych-content {
    max-width: 95%; /* this is mainly an IE 10-11 fix */
    text-align: center;
-   margin: auto; /* this is for overflowing content */
+   margin: auto;
+   width: 100%;
+   overflow: hidden; /* this is for overflowing content */
  }
 
+img[src="imgs/blue.png"] {
+   margin-left: -1000px;
+}
+
+img[src="imgs/orange.png"] {
+   margin-left: 1000px;
+}
+
+img[id="jspsych-citk-single-stim-stimulus-left"] {
+   margin-left: -625px;
+   position: absolute;
+}
+
+img[id="jspsych-citk-single-stim-stimulus-right"] {
+   margin-left: 425px;
+   position: absolute;
+}
  .jspsych-top {
    align-items: flex-start;
  }

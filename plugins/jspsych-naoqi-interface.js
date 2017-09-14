@@ -1,4 +1,4 @@
-/* jspsych-citk.js
+/* jspsych-naoqi-interface.js
  * Phillip Luecking
  *
  * This plugin is used for communication with the cognitive interaction toolkit. 
@@ -8,12 +8,12 @@
  * documentation: docs.jspsych.org
  */
 
-jsPsych.plugins['citk'] = (function() {
+jsPsych.plugins['naoqi-interface'] = (function() {
         
     var plugin = {};
 
     plugin.info = {
-    name: 'citk',
+    name: 'naoqi-interface',
     description: '',
     parameters: {
         joblist: {
@@ -78,20 +78,63 @@ jsPsych.plugins['citk'] = (function() {
     }
   
     var params;
+    var parser;
+    var poses_xml;
+    
+    var robot_side;
+    var arm_effector;
+    var hand_effector;
   
     plugin.preload = function(parameters) {
-        params = parameters; 
+        params = parameters;       
+        
+        if (window.XMLHttpRequest) {// code for IE7+, Firefox, Chrome, Opera, Safari
+            xmlhttp=new XMLHttpRequest();
+        } else { //code for IE6, IE5
+            xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+        }
+
+        xmlhttp.onload = function() {
+            poses_xml = new DOMParser().parseFromString(xmlhttp.responseText,'text/xml');
+        }
+        xmlhttp.open("GET",'http://'+params.service_url+'/jspsych-data/resources/poses.xml',true);
+        xmlhttp.setRequestHeader('Cache-Control', 'no-cache');
+        xmlhttp.send();
     }
     
     plugin.getvar = function() {
         return params;
     }
     
+    plugin.getPosFromXML = function(name_eff, name_pos, parsefloat = true) {
+        var position_array = []
+
+        posexml = poses_xml.getElementsByTagName(name_eff)[0].getElementsByTagName(name_pos)
+        var positions = posexml[0].getElementsByTagName("positions")[0];
+
+        for(var m = 0; m < positions.children.length; m++) {
+            if(parsefloat) {
+                position_array.push(parseFloat(positions.children[m].innerHTML));
+            } else {
+                position_array.push(positions.children[m].innerHTML);
+            }
+        }
+        
+        console.log(position_array)
+        return position_array;
+    }
+    
+    
+    plugin.saySomething = async function(whattosay) {
+        
+        plugin.buildRequest("ALTextToSpeech", "say", false, whattosay);
+    
+    }
+    
     plugin.sendRequest = async function(method) {
         function sleep(ms) {
            return new Promise(resolve => setTimeout(resolve, ms));
         }
-        
         
         var proxy = "ALMotion"
         var job_request = "http://"+params.service_url+":"+params.service_port+"/do/"+proxy;
@@ -106,9 +149,6 @@ jsPsych.plugins['citk'] = (function() {
             request = this.keyReleaseEvent();
         }
        
-       
-        console.log(request)
-        console.log(JSON.stringify(request))
     
         var xhr = new XMLHttpRequest();
         xhr.open("PUT", job_request, true);
@@ -118,35 +158,35 @@ jsPsych.plugins['citk'] = (function() {
                 //alert('Job status: ' + xhr.responseText);
                 //await sleep(Math.random() * 1500); //just wait a little bit after displaying the movements...
                 //display_element.innerHTML = ''; // clear the display
-                console.log(xhr.responseText)
                 ready = true;
                 //jsPsych.finishTrial();
             } else {
-                alert('Request failed. Returned status of ' + xhr.status);
+                //alert('Request failed. Returned status of ' + xhr.status);
             }
         };
         xhr.send(JSON.stringify(request));
         
     }
     
-    plugin.prepareRobot = async function() {
-        function sleep(ms) {
-           return new Promise(resolve => setTimeout(resolve, ms));
-        }
+    plugin.buildRequest = async function(proxy_, method_, async_, cmds_) {
+    
+        var proxy = proxy_;
         
-        var proxy = "ALMotion"
         var job_request = "http://"+params.service_url+":"+params.service_port+"/do/"+proxy;
         
-        var request = {};        
-        
-        var method = "rest"
-        request["async"] = false;
+        var request = {};          
+        var method = method_
+        request["async"] = async_;
         request["cmd"] = [method];
         
+        for (var i = 0; i < cmds_.length; i++) {
+            request["cmd"].push(cmds_[i]);
+        }
+    
         var xhr = new XMLHttpRequest();
         xhr.open("PUT", job_request, true);
         xhr.setRequestHeader( "Content-Type", "application/json" );
-        
+        console.log("[debug] sending " + JSON.stringify(request))
         xhr.onload = async function() {
             if (xhr.status === 200 || xhr.status === 201) {
                 //alert('Job status: ' + xhr.responseText);
@@ -156,84 +196,86 @@ jsPsych.plugins['citk'] = (function() {
                 ready = true;
                 //jsPsych.finishTrial();
             } else {
-                alert('Request failed. Returned status of ' + xhr.status);
+                //alert('Request failed. Returned status of ' + xhr.status);
             }
         };
         
-        xhr = new XMLHttpRequest();
-        xhr.open("PUT", job_request, true);
-        xhr.setRequestHeader( "Content-Type", "application/json" );
-        xhr.send(JSON.stringify(request));    
-        
-        request = {};        
-        method = "stiffnessInterpolation"
-        request["async"] = false;
-        request["cmd"] = [method];
-        request["cmd"].push("LArm");
-        request["cmd"].push(0.5);
-        request["cmd"].push(0.2);
-        
-        xhr = new XMLHttpRequest();
-        xhr.open("PUT", job_request, true);
-        xhr.setRequestHeader( "Content-Type", "application/json" );
-        xhr.send(JSON.stringify(request));
-    
-        request = {};        
-        method = "openHand"
-        request["async"] = false;
-        request["cmd"] = [method];
-        request["cmd"].push("LHand")
-        
-        xhr = new XMLHttpRequest();
-        xhr.open("PUT", job_request, true);
-        xhr.setRequestHeader( "Content-Type", "application/json" );
-        xhr.send(JSON.stringify(request));
-    
-        request = {};        
-        method = "angleInterpolation"
-        request["async"] = false;
-        request["cmd"] = [method];
-        request["cmd"].push(["LShoulderPitch", "LWristYaw", "LElbowYaw"]);
-        request["cmd"].push([[1.5], [1.65], [-1.45]]);
-        request["cmd"].push([[0.8], [0.8], [0.8]]);
-        request["cmd"].push(true);
-        
-        xhr = new XMLHttpRequest();
-        xhr.open("PUT", job_request, true);
-        xhr.setRequestHeader( "Content-Type", "application/json" );
         xhr.send(JSON.stringify(request));
     
     }
     
+    plugin.prepareRobot = async function(side) {
+        robot_side = side;
+        
+        hand_effector = side+"Hand";
+        arm_effector = side+"Arm";
+        
+        function sleep(ms) {
+           return new Promise(resolve => setTimeout(resolve, ms));
+        }     
+        
+        var prepose = plugin.getPosFromXML(arm_effector, "prepose");
+                           
+        var prepose_speed = [0.8, 0.8, 0.8, 0.8, 0.8, 0.8];
+         
+        plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, [arm_effector, 0.5, 0.2]);
+        plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, ["RLeg", 0.2, 1.0]); 
+        plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, ["LLeg", 0.2, 1.0]); 
+        plugin.buildRequest("ALMotion", "openHand", false, [hand_effector]); 
+        plugin.buildRequest("ALMotion", "angleInterpolation", true, [arm_effector, prepose, prepose_speed, true]); 
+        
+    }
+    
+    
+    plugin.goToSavePos = function() { 
+    
+        var savepose = plugin.getPosFromXML(arm_effector, "savepose");
+        
+        var savepose_speed = [0.8,0.8,0.8,0.8,0.8,0.8];
+           
+        plugin.buildRequest("ALMotion", "angleInterpolation", false, [arm_effector, savepose, savepose_speed, true]);
+        //plugin.buildRequest("ALMotion", "closeHand", false, ["RHand"]); 
+        plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, [arm_effector, 0.0, 5.0]); 
+        plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, ["RLeg", 0.0, 1.0]); 
+        plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, ["LLeg", 0.0, 1.0]); 
+        //plugin.buildRequest("ALMotion", "angleInterpolation", true, [["LShoulderPitch", "LWristYaw", "LElbowYaw"], [[1.5], [1.65], [-1.45]], [[0.8], [0.8], [0.8]]]);
+    
+    }    
     
     plugin.keyPressEvent = function() {
+        effector = robot_side+"ElbowRoll"
+        var keypress = plugin.getPosFromXML(effector, "keypress");
+        
+        var cmds_ = [effector, keypress[0], 0.1, true];
+
         var request = {};        
         
         var method = "angleInterpolation"
         request["async"] = false;
-        request["cmd"] = [method];           
+        request["cmd"] = [method];
         
-        request["cmd"].push("LElbowRoll");
-        request["cmd"].push([[-0.8]]);
-        
-        request["cmd"].push([[0.2]]);      
-        request["cmd"].push(true);
+        for (var i = 0; i < cmds_.length; i++) {
+            request["cmd"].push(cmds_[i]);
+        }
         
         return request;
     }
     
     plugin.keyReleaseEvent = function() {
+        effector = robot_side+"ElbowRoll"
+        var keyrelease = plugin.getPosFromXML(effector, "keyrelease");
+        
+        var cmds_ = [effector, keyrelease[0], 0.1, true];
+    
         var request = {};        
         
         var method = "angleInterpolation"
         request["async"] = false;
-        request["cmd"] = [method];           
+        request["cmd"] = [method];
         
-        request["cmd"].push("LElbowRoll");
-        request["cmd"].push([[-1.0]]);
-        
-        request["cmd"].push([[0.5]]);      
-        request["cmd"].push(true);
+        for (var i = 0; i < cmds_.length; i++) {
+            request["cmd"].push(cmds_[i]);
+        }
         
         return request;
     }
@@ -255,10 +297,6 @@ jsPsych.plugins['citk'] = (function() {
         
         trial.choices = trial.choices || jsPsych.ALL_KEYS;
         trial.parameter = trial.parameter || 'default value';
-
-        console.log(typeof trial.args)
-        console.log(trial.args)
-        console.log(typeof trial.args[0][0] === "string")
 
         // allow variables as functions
         // this allows any trial variable to be specified as a function

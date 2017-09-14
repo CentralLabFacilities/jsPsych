@@ -1764,7 +1764,6 @@ jsPsych.pluginAPI = (function() {
       } else if (parameters.rt_method == 'audio') {
         key_time = parameters.audio_context.currentTime
       }
-
       var valid_response = false;
       if (typeof parameters.valid_responses === 'undefined' || parameters.valid_responses == jsPsych.ALL_KEYS) {
         valid_response = true;
