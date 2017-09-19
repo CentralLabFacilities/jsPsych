@@ -97,7 +97,7 @@ jsPsych.plugins['naoqi-interface'] = (function() {
         xmlhttp.onload = function() {
             poses_xml = new DOMParser().parseFromString(xmlhttp.responseText,'text/xml');
         }
-        xmlhttp.open("GET",'http://'+params.service_url+'/data/poses.xml',true);
+        xmlhttp.open("GET",'http://'+params.service_url+':'+params.service_port+'/data/poses.xml',true);
         xmlhttp.setRequestHeader('Cache-Control', 'no-cache');
         xmlhttp.send();
     }
