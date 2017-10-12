@@ -243,13 +243,10 @@ jsPsych.plugins['naoqi-interface'] = (function() {
     }    
     
     plugin.keyPressEvent = function() {
-        effector = robot_side+"ElbowRoll"
-        var keypress = plugin.getPosFromXML(effector, "keypress");
         
-        var cmds_ = [effector, keypress[0], 0.1, true];
-
+        var keypress = plugin.getPosFromXML(arm_effector, "keypress");
+        var cmds_ = [effector, keypress, 0.1, true];
         var request = {};        
-        
         var method = "angleInterpolation"
         request["async"] = false;
         request["cmd"] = [method];
@@ -259,16 +256,30 @@ jsPsych.plugins['naoqi-interface'] = (function() {
         }
         
         return request;
+        
+        //effector = robot_side+"ElbowRoll"
+        //var keypress = plugin.getPosFromXML(effector, "keypress");
+        
+        //var cmds_ = [effector, keypress[0], 0.1, true];
+
+        //var request = {};        
+        
+        //var method = "angleInterpolation"
+        //request["async"] = false;
+        //request["cmd"] = [method];
+        
+        //for (var i = 0; i < cmds_.length; i++) {
+        //    request["cmd"].push(cmds_[i]);
+        //}
+        
+        //return request;
     }
     
     plugin.keyReleaseEvent = function() {
-        effector = robot_side+"ElbowRoll"
-        var keyrelease = plugin.getPosFromXML(effector, "keyrelease");
         
-        var cmds_ = [effector, keyrelease[0], 0.1, true];
-    
+        var keyrelease = plugin.getPosFromXML(arm_effector, "keyrelease");
+        var cmds_ = [effector, keyrelease, 0.1, true];
         var request = {};        
-        
         var method = "angleInterpolation"
         request["async"] = false;
         request["cmd"] = [method];
