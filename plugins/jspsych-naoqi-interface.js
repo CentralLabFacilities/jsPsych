@@ -218,7 +218,7 @@ jsPsych.plugins['naoqi-interface'] = (function() {
                            
         var prepose_speed = [0.8, 0.8, 0.8, 0.8, 0.8, 0.8];
          
-        plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, [arm_effector, 0.5, 0.2]);
+        plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, [arm_effector, 0.6, 0.2]);
         plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, ["RLeg", 0.2, 1.0]); 
         plugin.buildRequest("ALMotion", "stiffnessInterpolation", false, ["LLeg", 0.2, 1.0]); 
         plugin.buildRequest("ALMotion", "openHand", false, [hand_effector]); 
@@ -245,7 +245,7 @@ jsPsych.plugins['naoqi-interface'] = (function() {
     plugin.keyPressEvent = function() {
         
         var keypress = plugin.getPosFromXML(arm_effector, "keypress");
-        var cmds_ = [effector, keypress, 0.1, true];
+        var cmds_ = [arm_effector, keypress, 0.2, true];
         var request = {};        
         var method = "angleInterpolation"
         request["async"] = false;
@@ -278,7 +278,7 @@ jsPsych.plugins['naoqi-interface'] = (function() {
     plugin.keyReleaseEvent = function() {
         
         var keyrelease = plugin.getPosFromXML(arm_effector, "keyrelease");
-        var cmds_ = [effector, keyrelease, 0.1, true];
+        var cmds_ = [arm_effector, keyrelease, 0.2, true];
         var request = {};        
         var method = "angleInterpolation"
         request["async"] = false;
