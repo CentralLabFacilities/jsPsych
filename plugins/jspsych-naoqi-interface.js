@@ -214,7 +214,7 @@ jsPsych.plugins['naoqi-interface'] = (function() {
            return new Promise(resolve => setTimeout(resolve, ms));
         }     
         
-        var prepose = plugin.getPosFromXML(arm_effector, "prepose");
+        var prepose = plugin.getPosFromXML(arm_effector, "keyrelease");
                            
         var prepose_speed = [0.8, 0.8, 0.8, 0.8, 0.8, 0.8];
          
