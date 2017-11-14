@@ -26,6 +26,18 @@ jsPsych.plugins['timer'] = (function() {
         default: -1,
         no_function: false,
         description: ''
+      },
+      text: {
+        type: [jsPsych.plugins.parameterType.STRING],
+        default: undefined,
+        no_function: false,
+        description: ''
+      },
+      unit: {
+        type: [jsPsych.plugins.parameterType.STRING],
+        default: undefined,
+        no_function: false,
+        description: ''
       }
     }
   }
@@ -41,8 +53,8 @@ jsPsych.plugins['timer'] = (function() {
     var count=trial.seconds;  
     var counter=setInterval(timer, 1000)
 
-    display_element.innerHTML = 'Kurze Pause! Es geht weiter in <br><span id="timer"></span>'
-    document.getElementById("timer").innerHTML=count + " Sekunden."
+    display_element.innerHTML = trial.text
+    document.getElementById("timer").innerHTML=count + trial.unit
     
     var end_trial = function() {
         jsPsych.finishTrial(trial_data);
@@ -58,7 +70,7 @@ jsPsych.plugins['timer'] = (function() {
             end_trial();
             return;
         }
-        document.getElementById("timer").innerHTML=count + " Sekunden.";
+        document.getElementById("timer").innerHTML=count + trial.unit;
     }
 
     var return_val = 0; 
